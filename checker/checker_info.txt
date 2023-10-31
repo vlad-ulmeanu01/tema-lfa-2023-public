@@ -1,0 +1,23 @@
+#fisier input test, categorie test, punctaj, |w_ref|.
+../teste/test1.txt 1 5 -1
+../teste/test2.txt 1 5 -1
+../teste/test3.txt 1 5 609
+../teste/test4.txt 1 6 20015
+../teste/test5.txt 1 6 19996
+../teste/test6.txt 1 6 19413
+../teste/test7.txt 1 7 20255
+../teste/test8.txt 1 7 20000
+../teste/test9.txt 1 7 20000
+../teste/test10.txt 1 6 20000
+../teste/test11.txt 2 5 -1
+../teste/test12.txt 2 8 100000035
+../teste/test13.txt 2 9 100000000
+../teste/test14.txt 2 9 100000014
+../teste/test15.txt 2 9 100000002
+../teste/test16.txt 3 4 100000372
+../teste/test17.txt 3 4 100000620
+../teste/test18.txt 3 5 100000903
+../teste/test19.txt 3 4 100010194
+../teste/test20.txt 3 4 100025877
+../teste/test21.txt 3 4 100000000
+
