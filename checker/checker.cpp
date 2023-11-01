@@ -1,7 +1,8 @@
 #include "checker_utils.h"
 
 const int MAX_ACCEPTED_LEN = 200'000'000;
-const int TIME_LIMIT_SECONDS = 80;
+const int TIME_LIMIT_SECONDS = 120;
+const int MAX_TIME_LIMIT_SECONDS = 800;
 
 ///daca raspunsul participantului este acceptat de DFA, are lungimea minim k si are lungimea maxim 2e8, intorc (|w| lui, k).
 ///daca raspunsul participantului este -1, intorc (-1, k).
@@ -71,7 +72,7 @@ int main(int argc, char **argv) {
 
     if (argc != 3) {
         std::cerr << "usage: ./checker <..locatie checker_info.txt..> <..director makefile cod de testat..>" << '\n';
-        std::cerr << "ex ./checker checker_info.txt ../src/" << '\n';
+        std::cerr << "ex ./checker checker_info.txt ../implementare_uva/" << '\n';
         return 0;
     }
 
@@ -83,6 +84,7 @@ int main(int argc, char **argv) {
     std::ifstream checkerInfo(argv[1]);
     assert(checkerInfo.is_open());
 
+    double maxTimeLeft = MAX_TIME_LIMIT_SECONDS;
     double scor = 0;
     std::string checkerLine;
 
@@ -105,18 +107,26 @@ int main(int argc, char **argv) {
             ///copiez inputul testului in input.txt.
             system((std::string("cp ") + testInput + " " + implLoc + "input.txt").c_str());
 
+            std::cout << "running test " << testInput << ":\n";
+
             ///rulez codul participantului.
+            int timeLimitParticipant = std::max(1, std::min(TIME_LIMIT_SECONDS, (int)maxTimeLeft));
+
             auto start = std::chrono::steady_clock::now();
             int retVal = system((std::string("timeout ") +
-                                std::to_string(TIME_LIMIT_SECONDS) +
+                                std::to_string(timeLimitParticipant) +
                                 std::string(" make --no-print-directory -C ") + implLoc + " run").c_str());
 
+            double timePassed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count() / 1e6;
+            maxTimeLeft -= timePassed;
+
             if (retVal == 124) {
-                std::cerr << "time limit of " << TIME_LIMIT_SECONDS << " s exceeded.\n";
+                std::cout << "(" << testInput << ") time limit of " << TIME_LIMIT_SECONDS << " s exceeded.\n";
             } else if (retVal != 0) {
-                std::cerr << "participant's process ended unexpectedly with retVal = " << retVal << '\n';
+                std::cout << "(" << testInput << ") participant's process ended unexpectedly with retVal = " << retVal << '\n';
+                std::cout << "(" << testInput << ") process ran for: " << timePassed << " s.\n";
             } else {
-                std::cerr << "process ran for: " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count() / 1e6 << " s.\n";
+                std::cout << "(" << testInput << ") process ran for: " << timePassed << " s.\n";
 
                 std::ifstream fin(testInput);
                 std::ifstream participant(implLoc + "output.txt");
@@ -127,7 +137,6 @@ int main(int argc, char **argv) {
                 if (evalAns.has_value()) {
                     int partWref, k;
                     std::tie(partWref, k) = evalAns.value();
-                    std::cerr << "partWref = " << partWref << '\n';
 
                     if (partWref == -1) {
                         if (lenWRef == -1) testScore = scorNow;
@@ -147,7 +156,7 @@ int main(int argc, char **argv) {
                     }
                 }
 
-                std::cout << "current test score: " << testScore << '\n';
+                std::cout << "(" << testInput << ") current test score: " << testScore << '\n';
                 scor += testScore;
 
                 fin.close();
@@ -159,6 +168,7 @@ int main(int argc, char **argv) {
             system((std::string("rm ") + implLoc + "output.txt").c_str());
 
             std::cout << "score after " << testInput << ": " << scor << '\n';
+            std::cout << "time left till timeout: " << maxTimeLeft << '\n';
         }
     }
 
