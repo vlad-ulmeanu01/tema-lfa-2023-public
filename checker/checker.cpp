@@ -7,8 +7,8 @@ const int MAX_TIME_LIMIT_SECONDS = 800;
 ///daca raspunsul participantului este acceptat de DFA, are lungimea minim k si are lungimea maxim 2e8, intorc (|w| lui, k).
 ///daca raspunsul participantului este -1, intorc (-1, k).
 std::optional<std::pair<int, int>> evaluateOutput(std::ifstream &fin, std::ifstream &participant) {
-#define CHECK_READ_PAIR(x) if (!(x).second.empty()) { std::cerr << (x).second << '\n'; return std::nullopt; }
-#define BYE(bye_str) { std::cerr << bye_str << '\n'; return std::nullopt; }
+#define CHECK_READ_PAIR(x) if (!(x).second.empty()) { std::cout << (x).second << '\n'; return std::nullopt; }
+#define BYE(bye_str) { std::cout << bye_str << '\n'; return std::nullopt; }
 
     auto t = readInt(fin, 1, 3, "t"); CHECK_READ_PAIR(t);
     auto n = readInt(fin, 1, 1'000'000, "n"); CHECK_READ_PAIR(n);
